@@ -1,0 +1,10 @@
+syntax = "proto3"; //su dung proto3
+
+package calculator; //unique file proto
+
+option go_package="calculatorpb";
+
+//ten service
+service CalculatorService {
+
+}
