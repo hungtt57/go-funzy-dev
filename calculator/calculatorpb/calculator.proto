@@ -4,7 +4,17 @@ package calculator; //unique file proto
 
 option go_package="calculatorpb";
 
+message SumRequest {
+    int32 num1 = 1; //1 la so thu tu
+    int32 num2 = 2;
+}
+
+message SumResponse {
+    int32 result = 1;
+}
+
 //ten service
 service CalculatorService {
-
+    rpc Sum(SumRequest) returns (SumResponse) {}
 }
+
