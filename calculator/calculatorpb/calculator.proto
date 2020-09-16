@@ -21,11 +21,21 @@ message PDNResponse {
     int32 result = 1;
 }
 
+message AverageRequest {
+    float num = 1;
+}
 
-//ten service
+message AverageResponse {
+    float result = 1;
+}
+
+
+//Ten service
 service CalculatorService {
     rpc Sum(SumRequest) returns (SumResponse) {}
 
     rpc PrimeNumberDecomposition(PNDRequest) returns (stream PDNResponse) {}
+
+    rpc Average(stream AverageRequest) returns (AverageResponse) {}
 }
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hungtt57/go-funzy-dev/calculator/calculatorpb"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 	"time"
@@ -40,6 +41,31 @@ func (*server) PrimeNumberDecomposition(req *calculatorpb.PNDRequest,
 	}
 	return nil
 }
+
+func (*server) Average(stream calculatorpb.CalculatorService_AverageServer) error {
+	log.Println("Average called...")
+	var total float32
+	var count int
+	for {
+		req, err := stream.Recv()
+
+		if err == io.EOF {
+			//tinh trung binh o day
+			resp := &calculatorpb.AverageResponse{
+				Result: total / float32(count),
+			}
+
+			return stream.SendAndClose(resp)
+		}
+		if err != nil {
+			log.Fatalf("err while Recv Average %v", err)
+		}
+		log.Println("receive num %v", req)
+		total += req.GetNum()
+		count++
+	}
+}
+
 func main() {
 	lis, err := net.Listen("tcp", "0.0.0.0:50069")
 
