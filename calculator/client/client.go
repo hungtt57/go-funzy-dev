@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"io"
 	"time"
 
@@ -21,13 +23,14 @@ func main() {
 	defer cc.Close() //chay cuoi cung main
 
 	client := calculatorpb.NewCalculatorServiceClient(cc)
-	//calllSum(client)
+	//callSum(client)
 	//callPND(client)
 	//callAverage(client)
-	callFindMax(client)
+	//callFindMax(client)
+	callSquareRoot(client, -2)
 }
 
-func calllSum(c calculatorpb.CalculatorServiceClient) {
+func callSum(c calculatorpb.CalculatorServiceClient) {
 	log.Println("Calling sum api")
 	resp, err := c.Sum(context.Background(), &calculatorpb.SumRequest{
 		Num1: 5,
@@ -151,4 +154,22 @@ func callFindMax(c calculatorpb.CalculatorServiceClient) {
 	}()
 
 	<-waitc
+}
+func callSquareRoot(c calculatorpb.CalculatorServiceClient, num int32) {
+	log.Println("Calling square api")
+	resp, err := c.Square(context.Background(), &calculatorpb.SquareRequest{
+		Num: num,
+	})
+	if err != nil {
+		log.Printf("call sum api err %v", err)
+		if errStatus, ok := status.FromError(err); ok {
+			log.Printf("err msg: %v\n", errStatus.Message())
+			log.Printf("err code: %v\n", errStatus.Code())
+			if errStatus.Code() == codes.InvalidArgument {
+				log.Printf("InvalidArgument num %v", num)
+				return;
+			}
+		}
+	}
+	log.Printf("callSquareRoot api response %v", resp.GetSquareRoot())
 }

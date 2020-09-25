@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"github.com/hungtt57/go-funzy-dev/calculator/calculatorpb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"io"
 	"log"
+	"math"
 	"net"
 	"time"
 )
@@ -21,8 +24,7 @@ func (*server) Sum(context context.Context, req *calculatorpb.SumRequest) (*calc
 	return resp, nil
 }
 
-func (*server) PrimeNumberDecomposition(req *calculatorpb.PNDRequest,
-	stream calculatorpb.CalculatorService_PrimeNumberDecompositionServer) error {
+func (*server) PrimeNumberDecomposition(req *calculatorpb.PNDRequest, stream calculatorpb.CalculatorService_PrimeNumberDecompositionServer) error {
 	log.Println("PrimeNumberDecomposition called...")
 	k := int32(2)
 	N := req.GetNumber()
@@ -92,6 +94,19 @@ func (*server) FindMax(stream calculatorpb.CalculatorService_FindMaxServer) erro
 		}
 	}
 }
+
+func (*server) Square(ctx context.Context, req *calculatorpb.SquareRequest) (*calculatorpb.SquareResponse, error) {
+	log.Println("Square called....")
+	num := req.GetNum()
+	if num < 0 {
+		log.Printf("req num < 9, num=%v, return InvalidArgument", num)
+		return nil, status.Errorf(codes.InvalidArgument, "Expect num > 0, req num was %v", num)
+	}
+	return &calculatorpb.SquareResponse{
+		SquareRoot: math.Sqrt(float64(num)),
+	}, nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", "0.0.0.0:50069")
 
