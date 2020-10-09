@@ -4,6 +4,7 @@ import (
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"io"
 	"time"
@@ -14,7 +15,14 @@ import (
 )
 
 func main() {
-	cc, err := grpc.Dial("localhost:50069", grpc.WithInsecure()) //connect den 50069
+	certFile := "ssl/ca.crt"
+	creds, sslErr := credentials.NewClientTLSFromFile(certFile, "")
+
+	if sslErr != nil {
+		log.Fatalf("Create client creds ssl err %v\n", sslErr)
+		return
+	}
+	cc, err := grpc.Dial("localhost:50069", grpc.WithTransportCredentials(creds)) //connect den 50069
 
 	if err != nil {
 		log.Fatalf(" err while dial %v", err)
@@ -23,14 +31,14 @@ func main() {
 	defer cc.Close() //chay cuoi cung main
 
 	client := calculatorpb.NewCalculatorServiceClient(cc)
-	//callSum(client)
+	callSum(client)
 	//callPND(client)
 	//callAverage(client)
 	//callFindMax(client)
 	//callSquareRoot(client, -2)
 
-	callSumWithDeadline(client, 1 * time.Second) //  bi timeout
-	callSumWithDeadline(client, 5 * time.Second) //ko bi timeout
+	//callSumWithDeadline(client, 1 * time.Second) //  bi timeout
+	//callSumWithDeadline(client, 5 * time.Second) //ko bi timeout
 }
 
 func callSumWithDeadline(c calculatorpb.CalculatorServiceClient, timeout time.Duration) {

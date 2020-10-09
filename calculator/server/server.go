@@ -6,6 +6,7 @@ import (
 	"github.com/hungtt57/go-funzy-dev/calculator/calculatorpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"io"
 	"log"
@@ -130,7 +131,16 @@ func main() {
 		log.Fatal("Err while create listen %v", err)
 	}
 
-	s := grpc.NewServer()
+	certFile := "ssl/server.crt"
+	keyFile := "ssl/server.pem"
+	creds, sslErr := credentials.NewServerTLSFromFile(certFile, keyFile)
+
+	if sslErr != nil {
+		log.Fatalf("Create creds ssl err %v\n", sslErr)
+	}
+	opts := grpc.Creds(creds)
+
+	s := grpc.NewServer(opts)
 
 	calculatorpb.RegisterCalculatorServiceServer(s, &server{})
 	fmt.Println("Server running")
