@@ -18,6 +18,7 @@ message PNDRequest {
 }
 
 message PDNResponse {
+
     int32 result = 1;
 }
 
